@@ -83,29 +83,34 @@ class DBManager:
             for fila in filas
         ]
         return proyectos
-    
+
     def obtener_tareas(self, estado=None):
         conn = get_connection()
         cursor = conn.cursor()
-        sql =  "SELECT * FROM tareas"
-        params = ()
+
+        sql = "SELECT * FROM tareas"
+        params = []
+
         if estado:
             sql += " WHERE estado = ?"
             params.append(estado)
+
         sql += " ORDER BY fecha_limite ASC"
+
         cursor.execute(sql, params)
         filas = cursor.fetchall()
         conn.close()
+
         tareas = []
         for fila in filas:
-            t = Tarea(  
+            t = Tarea(
                 titulo=fila['titulo'],
-                descripcion=fila['descripcion'],
                 fecha_limite=fila['fecha_limite'],
-                fecha_creacion=fila['fecha_creacion'],
                 prioridad=fila['prioridad'],
-                estado=fila['estado'],
                 proyecto_id=fila['proyecto_id'],
+                estado=fila['estado'],
+                descripcion=fila['descripcion'],
+                fecha_creacion=fila['fecha_creacion'],
                 id=fila['id']
             )
             tareas.append(t)
@@ -119,17 +124,18 @@ if __name__ == '__main__':
         print(f"Base de datos {DATABASE_NAME} eliminada.")
 
     crear_tablas()
-    print(f"Base de datos {DATABASE_NAME} y tablas inicializadas correctamente.")
-    
+    print(
+        f"Base de datos {DATABASE_NAME} y tablas inicializadas correctamente.")
+
     # Prueba del CRUD (CREATE)
     manager = DBManager()
     tarea_prueba = Tarea(
-        titulo="Completar Ejercicio de CRUD", 
-        fecha_limite="2025-10-30", 
-        prioridad="Alta", 
+        titulo="Completar Ejercicio de CRUD",
+        fecha_limite="2025-10-30",
+        prioridad="Alta",
         proyecto_id=0,
         descripcion="Implementar el módulo database.py"
     )
-    
+
     tarea_creada = manager.crear_tarea(tarea_prueba)
     print(f"Tarea creada y ID asignado: {tarea_creada.id}")
